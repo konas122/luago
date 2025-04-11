@@ -1,0 +1,11 @@
+.vs/
+.vscode/
+
+out/
+build/
+
+!tools/*.exe
+
+./*.exe
+*.pdb
+*.out
