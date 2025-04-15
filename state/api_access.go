@@ -122,8 +122,7 @@ func (lstate *luaState) ToInteger(idx int) int64 {
 // http://www.lua.org/manual/5.3/manual.html#lua_tointegerx
 func (lstate *luaState) ToIntegerX(idx int) (int64, bool) {
 	val := lstate.stack.get(idx)
-	i, ok := val.(int64)
-	return i, ok
+	return convertToInteger(val)
 }
 
 // [-0, +0, –]
@@ -137,14 +136,7 @@ func (lstate *luaState) ToNumber(idx int) float64 {
 // http://www.lua.org/manual/5.3/manual.html#lua_tonumberx
 func (lstate *luaState) ToNumberX(idx int) (float64, bool) {
 	val := lstate.stack.get(idx)
-	switch x := val.(type) {
-	case float64:
-		return x, true
-	case int64:
-		return float64(x), true
-	default:
-		return 0, false
-	}
+	return convertToFloat(val)
 }
 
 // [-0, +0, m]
