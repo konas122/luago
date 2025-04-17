@@ -7,7 +7,7 @@ import (
 )
 
 func Test_api(t *testing.T) {
-	ls := state.New()
+	ls := state.New(20, nil)
 
 	ls.PushBoolean(true)
 	printStack(ls)

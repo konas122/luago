@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"luago/api"
 	"luago/chunk"
+	"luago/state"
 	"luago/vm"
 	"os"
 )
@@ -17,6 +19,27 @@ func main() {
 
 		proto := chunk.Undump(data)
 		list(proto)
+
+		print("\n=========================\n\n")
+
+		luaMain(proto)
+	}
+}
+
+func luaMain(proto *chunk.Prototype) {
+	nRegs := int(proto.MaxStackSize)
+	lstate := state.New(nRegs+8, proto)
+	lstate.SetTop(nRegs)
+	for {
+		pc := lstate.PC()
+		inst := vm.Instruction(lstate.Fetch())
+		if inst.Opcode() != vm.OP_RETURN {
+			inst.Execute(lstate)
+			fmt.Printf("[%02d] %s", pc+1, inst.OpName())
+			printStack(lstate)
+		} else {
+			break
+		}
 	}
 }
 
@@ -142,4 +165,22 @@ func printOperands(i vm.Instruction) {
 		ax := i.Ax()
 		fmt.Printf("%d", -1-ax)
 	}
+}
+
+func printStack(ls api.LuaState) {
+	top := ls.GetTop()
+	for i := 1; i <= top; i++ {
+		t := ls.Type(i)
+		switch t {
+		case api.LUA_TBOOLEAN:
+			fmt.Printf("[%t]", ls.ToBoolean(i))
+		case api.LUA_TNUMBER:
+			fmt.Printf("[%g]", ls.ToNumber(i))
+		case api.LUA_TSTRING:
+			fmt.Printf("[%q]", ls.ToString(i))
+		default: // other values
+			fmt.Printf("[%s]", ls.TypeName(t))
+		}
+	}
+	fmt.Println()
 }
