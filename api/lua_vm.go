@@ -7,4 +7,7 @@ type LuaVM interface {
 	Fetch() uint32
 	GetConst(idx int)
 	GetRK(rk int)
+	RegisterCount() int
+	LoadVararg(n int)
+	LoadProto(idx int)
 }

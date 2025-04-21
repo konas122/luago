@@ -22,25 +22,14 @@ func main() {
 
 		print("\n=========================\n\n")
 
-		luaMain(proto)
+		luaMain(os.Args[1], data)
 	}
 }
 
-func luaMain(proto *chunk.Prototype) {
-	nRegs := int(proto.MaxStackSize)
-	lstate := state.New(nRegs+8, proto)
-	lstate.SetTop(nRegs)
-	for {
-		pc := lstate.PC()
-		inst := vm.Instruction(lstate.Fetch())
-		if inst.Opcode() != vm.OP_RETURN {
-			inst.Execute(lstate)
-			fmt.Printf("[%02d] %s", pc+1, inst.OpName())
-			printStack(lstate)
-		} else {
-			break
-		}
-	}
+func luaMain(filename string, data []byte) {
+	lstate := state.New()
+	lstate.Load(data, filename, "b")
+	lstate.Call(0, 0)
 }
 
 func list(f *chunk.Prototype) {

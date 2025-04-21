@@ -20,13 +20,13 @@ func LuacInsight(filename string) {
 
 	print("\n=========================\n\n")
 
-	luaMain(proto)
+	luaMain(filename, data)
 }
 
-func luaMain(proto *chunk.Prototype) {
-	nRegs := int(proto.MaxStackSize)
-	lstate := state.New(nRegs+8, proto)
-	lstate.SetTop(nRegs)
+func luaMain(filename string, data []byte) {
+	lstate := state.New()
+	lstate.Load(data, filename, "b")
+	lstate.Call(0, 0)
 	for {
 		pc := lstate.PC()
 		inst := vm.Instruction(lstate.Fetch())
