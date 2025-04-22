@@ -28,6 +28,7 @@ func main() {
 
 func luaMain(filename string, data []byte) {
 	lstate := state.New()
+	lstate.Register("print", print_test)
 	lstate.Load(data, filename, "b")
 	lstate.Call(0, 0)
 }
@@ -172,4 +173,22 @@ func printStack(ls api.LuaState) {
 		}
 	}
 	fmt.Println()
+}
+
+func print_test(ls api.LuaState) int {
+	nArgs := ls.GetTop()
+	for i := 1; i <= nArgs; i++ {
+		if ls.IsBoolean(i) {
+			fmt.Printf("%t", ls.ToBoolean(i))
+		} else if ls.IsString(i) {
+			fmt.Print(ls.ToString(i))
+		} else {
+			fmt.Print(ls.TypeName(ls.Type(i)))
+		}
+		if i < nArgs {
+			fmt.Print("\t")
+		}
+	}
+	fmt.Println("\n`print_test` called!!")
+	return 0
 }
