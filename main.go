@@ -189,6 +189,7 @@ func print_test(ls api.LuaState) int {
 			fmt.Print("\t")
 		}
 	}
-	fmt.Println("\n`print_test` called!!")
+	fmt.Println()
+	// fmt.Println("\n`print_test` called!!")
 	return 0
 }

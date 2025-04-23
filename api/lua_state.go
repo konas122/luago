@@ -46,6 +46,7 @@ type LuaState interface {
 	PushNumber(n float64)
 	PushString(s string)
 	PushGoFunction(f GoFunction)
+	PushGoClosure(f GoFunction, n int)
 	PushGlobalTable()
 	/* Comparison and arithmetic functions */
 	Arith(op ArithOp)
@@ -73,3 +74,7 @@ type LuaState interface {
 }
 
 type GoFunction func(LuaState) int
+
+func LuaUpvalueIndex(i int) int {
+	return LUA_REGISTRYINDEX - i
+}

@@ -10,6 +10,10 @@ func (self *luaState) Load(binchunk []byte, chunkName, mode string) int {
 	proto := chunk.Undump(binchunk)
 	c := newLuaClosure(proto)
 	self.stack.push(c)
+	if len(proto.Upvalues) > 0 {
+		env := self.registry.get(LUA_RIDX_GLOBALS)
+		c.upvals[0] = &upvalue{&env}
+	}
 	return 0
 }
 
