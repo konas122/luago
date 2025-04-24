@@ -51,8 +51,10 @@ type LuaState interface {
 	/* Comparison and arithmetic functions */
 	Arith(op ArithOp)
 	Compare(idx1, idx2 int, op CompareOp) bool
+	RawEqual(idx1, idx2 int) bool
 	/* miscellaneous functions */
 	Len(idx int)
+	RawLen(idx int) uint
 	Concat(n int)
 
 	/* get functions (Lua -> stack) */
@@ -61,11 +63,18 @@ type LuaState interface {
 	GetTable(idx int) LuaType
 	GetField(idx int, k string) LuaType
 	GetI(idx int, i int64) LuaType
+	RawGet(idx int) LuaType
+	RawGetI(idx int, i int64) LuaType
+	GetMetatable(idx int) bool
 	GetGlobal(name string) LuaType
+
 	/* set functions (stack -> Lua) */
 	SetTable(idx int)
 	SetField(idx int, k string)
 	SetI(idx int, i int64)
+	RawSet(idx int)
+	RawSetI(idx int, i int64)
+	SetMetatable(idx int)
 	SetGlobal(name string)
 	Register(name string, f GoFunction)
 	/* 'load' and 'call' functions (load and run Lua code) */

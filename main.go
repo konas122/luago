@@ -29,6 +29,8 @@ func main() {
 func luaMain(filename string, data []byte) {
 	lstate := state.New()
 	lstate.Register("print", print_test)
+	lstate.Register("getmetatable", getMetatable)
+	lstate.Register("setmetatable", setMetatable)
 	lstate.Load(data, filename, "b")
 	lstate.Call(0, 0)
 }
@@ -157,24 +159,6 @@ func printOperands(i vm.Instruction) {
 	}
 }
 
-func printStack(ls api.LuaState) {
-	top := ls.GetTop()
-	for i := 1; i <= top; i++ {
-		t := ls.Type(i)
-		switch t {
-		case api.LUA_TBOOLEAN:
-			fmt.Printf("[%t]", ls.ToBoolean(i))
-		case api.LUA_TNUMBER:
-			fmt.Printf("[%g]", ls.ToNumber(i))
-		case api.LUA_TSTRING:
-			fmt.Printf("[%q]", ls.ToString(i))
-		default: // other values
-			fmt.Printf("[%s]", ls.TypeName(t))
-		}
-	}
-	fmt.Println()
-}
-
 func print_test(ls api.LuaState) int {
 	nArgs := ls.GetTop()
 	for i := 1; i <= nArgs; i++ {
@@ -192,4 +176,16 @@ func print_test(ls api.LuaState) int {
 	fmt.Println()
 	// fmt.Println("\n`print_test` called!!")
 	return 0
+}
+
+func getMetatable(ls api.LuaState) int {
+	if !ls.GetMetatable(1) {
+		ls.PushNil()
+	}
+	return 1
+}
+
+func setMetatable(ls api.LuaState) int {
+	ls.SetMetatable(1)
+	return 1
 }

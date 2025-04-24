@@ -7,6 +7,7 @@ import (
 )
 
 type operator struct {
+	metamethod  string
 	integerFunc func(int64, int64) int64
 	floatFunc   func(float64, float64) float64
 }
@@ -35,39 +36,46 @@ var (
 )
 
 var operators = []operator{
-	{iadd, fadd},
-	{isub, fsub},
-	{imul, fmul},
-	{imod, fmod},
-	{nil, pow},
-	{nil, div},
-	{iidiv, fidiv},
-	{band, nil},
-	{bor, nil},
-	{bxor, nil},
-	{shl, nil},
-	{shr, nil},
-	{iunm, funm},
-	{bnot, nil},
+	{"__add", iadd, fadd},
+	{"__sub", isub, fsub},
+	{"__mul", imul, fmul},
+	{"__mod", imod, fmod},
+	{"__pow", nil, pow},
+	{"__div", nil, div},
+	{"__idiv", iidiv, fidiv},
+	{"__band", band, nil},
+	{"__bor", bor, nil},
+	{"__bxor", bxor, nil},
+	{"__shl", shl, nil},
+	{"__shr", shr, nil},
+	{"__unm", iunm, funm},
+	{"__bnot", bnot, nil},
 }
 
 // [-(2|1), +1, e]
 // http://www.lua.org/manual/5.3/manual.html#lua_arith
-func (lstate *luaState) Arith(op ArithOp) {
+func (self *luaState) Arith(op ArithOp) {
 	var a, b luaValue
-	b = lstate.stack.pop()
+	b = self.stack.pop()
 	if op != LUA_OPUNM && op != LUA_OPBNOT {
-		a = lstate.stack.pop()
+		a = self.stack.pop()
 	} else {
 		a = b
 	}
 
 	operator := operators[op]
 	if result := _arith(a, b, operator); result != nil {
-		lstate.stack.push(result)
-	} else {
-		panic("arithmetic error!")
+		self.stack.push(result)
+		return
 	}
+
+	mm := operator.metamethod
+	if result, ok := callMetamethod(a, b, mm, self); ok {
+		self.stack.push(result)
+		return
+	}
+
+	panic("arithmetic error!")
 }
 
 func _arith(a, b luaValue, op operator) luaValue {
@@ -79,9 +87,9 @@ func _arith(a, b luaValue, op operator) luaValue {
 		}
 	} else {
 		if op.integerFunc != nil {
-			if x, ok := convertToFloat(a); ok {
-				if y, ok := convertToFloat(b); ok {
-					return op.floatFunc(x, y)
+			if x, ok := a.(int64); ok {
+				if y, ok := b.(int64); ok {
+					return op.integerFunc(x, y)
 				}
 			}
 		}
