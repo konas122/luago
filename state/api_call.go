@@ -99,3 +99,27 @@ func (self *luaState) runLuaClosure() {
 		}
 	}
 }
+
+// Calls a function in protected mode.
+// http://www.lua.org/manual/5.3/manual.html#lua_pcallG
+func (self *luaState) PCall(nArgs, nResults, msgh int) (status int) {
+	caller := self.stack
+	status = LUA_ERRRUN
+
+	// catch error
+	defer func() {
+		if err := recover(); err != nil {
+			if msgh != 0 {
+				panic(err)
+			}
+			for self.stack != caller {
+				self.popLuaStack()
+			}
+			self.stack.push(err)
+		}
+	}()
+
+	self.Call(nArgs, nResults)
+	status = LUA_OK
+	return
+}

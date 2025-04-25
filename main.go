@@ -34,6 +34,8 @@ func luaMain(filename string, data []byte) {
 	lstate.Register("next", next)
 	lstate.Register("pairs", pairs)
 	lstate.Register("ipairs", iPairs)
+	lstate.Register("error", error)
+	lstate.Register("pcall", pCall)
 	lstate.Load(data, filename, "b")
 	lstate.Call(0, 0)
 }
@@ -225,4 +227,16 @@ func _iPairsAux(ls api.LuaState) int {
 	} else {
 		return 2
 	}
+}
+
+func error(ls api.LuaState) int {
+	return ls.Error()
+}
+
+func pCall(ls api.LuaState) int {
+	nArgs := ls.GetTop() - 1
+	status := ls.PCall(nArgs, -1, 0)
+	ls.PushBoolean(status == api.LUA_OK)
+	ls.Insert(1)
+	return ls.GetTop()
 }

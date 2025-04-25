@@ -57,6 +57,7 @@ type LuaState interface {
 	RawLen(idx int) uint
 	Concat(n int)
 	Next(idx int) bool
+	Error() int
 
 	/* get functions (Lua -> stack) */
 	NewTable()
@@ -81,6 +82,7 @@ type LuaState interface {
 	/* 'load' and 'call' functions (load and run Lua code) */
 	Load(chunk []byte, chunkName, mode string) int
 	Call(nArgs, nResults int)
+	PCall(nArgs, nResults, msgh int) int
 }
 
 type GoFunction func(LuaState) int
