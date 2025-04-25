@@ -31,6 +31,9 @@ func luaMain(filename string, data []byte) {
 	lstate.Register("print", print_test)
 	lstate.Register("getmetatable", getMetatable)
 	lstate.Register("setmetatable", setMetatable)
+	lstate.Register("next", next)
+	lstate.Register("pairs", pairs)
+	lstate.Register("ipairs", iPairs)
 	lstate.Load(data, filename, "b")
 	lstate.Call(0, 0)
 }
@@ -188,4 +191,38 @@ func getMetatable(ls api.LuaState) int {
 func setMetatable(ls api.LuaState) int {
 	ls.SetMetatable(1)
 	return 1
+}
+
+func next(ls api.LuaState) int {
+	ls.SetTop(2)
+	if ls.Next(1) {
+		return 2
+	} else {
+		ls.PushNil()
+		return 1
+	}
+}
+
+func pairs(ls api.LuaState) int {
+	ls.PushGoFunction(next) /* will return generator, */
+	ls.PushValue(1)         /* state, */
+	ls.PushNil()
+	return 3
+}
+
+func iPairs(ls api.LuaState) int {
+	ls.PushGoFunction(_iPairsAux) /* iteration function */
+	ls.PushValue(1)               /* state */
+	ls.PushInteger(0)             /* initial value */
+	return 3
+}
+
+func _iPairsAux(ls api.LuaState) int {
+	i := ls.ToInteger(2) + 1
+	ls.PushInteger(i)
+	if ls.GetI(1, i) == api.LUA_TNIL {
+		return 1
+	} else {
+		return 2
+	}
 }
