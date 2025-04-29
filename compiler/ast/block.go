@@ -4,8 +4,8 @@ package ast
 // type Chunk *Block
 
 // block ::= {stat} [retstat]
-// retstat ::= return [explist] [‘;’]
-// explist ::= exp {‘,’ exp}
+// retstat ::= return [explist] [';']
+// explist ::= exp {',' exp}
 type Block struct {
 	LastLine int
 	Stats    []Stat

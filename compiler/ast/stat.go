@@ -1,8 +1,8 @@
 package ast
 
 /*
-stat ::=  ‘;’
-	| varlist ‘=’ explist
+stat ::=  ';'
+	| varlist '=' explist
 	| functioncall
 	| label
 	| break
@@ -11,17 +11,17 @@ stat ::=  ‘;’
 	| while exp do block end
 	| repeat block until exp
 	| if exp then block {elseif exp then block} [else block] end
-	| for Name ‘=’ exp ‘,’ exp [‘,’ exp] do block end
+	| for Name '=' exp ',' exp [',' exp] do block end
 	| for namelist in explist do block end
 	| function funcname funcbody
 	| local function Name funcbody
-	| local namelist [‘=’ explist]
+	| local namelist ['=' explist]
 */
 type Stat interface{}
 
-type EmptyStat struct{}              // ‘;’
+type EmptyStat struct{}              // ';'
 type BreakStat struct{ Line int }    // break
-type LabelStat struct{ Name string } // ‘::’ Name ‘::’
+type LabelStat struct{ Name string } // '::' Name '::'
 type GotoStat struct{ Name string }  // goto Name
 type DoStat struct{ Block *Block }   // do block end
 type FuncCallStat = FuncCallExp      // functioncall
@@ -44,7 +44,7 @@ type RepeatStat struct {
 	Exp   Exp
 }
 
-// for Name ‘=’ exp ‘,’ exp [‘,’ exp] do block end
+// for Name '=' exp ',' exp [',' exp] do block end
 type ForNumStat struct {
 	LineOfFor int
 	LineOfDo  int
@@ -56,8 +56,8 @@ type ForNumStat struct {
 }
 
 // for namelist in explist do block end
-// namelist ::= Name {‘,’ Name}
-// explist ::= exp {‘,’ exp}
+// namelist ::= Name {',' Name}
+// explist ::= exp {',' exp}
 type ForInStat struct {
 	LineOfDo int
 	NameList []string
@@ -65,18 +65,18 @@ type ForInStat struct {
 	Block    *Block
 }
 
-// varlist ‘=’ explist
-// varlist ::= var {‘,’ var}
-// var ::=  Name | prefixexp ‘[’ exp ‘]’ | prefixexp ‘.’ Name
+// varlist '=' explist
+// varlist ::= var {',' var}
+// var ::=  Name | prefixexp '[' exp ']' | prefixexp '.' Name
 type AssignStat struct {
 	LastLine int
 	VarList  []Exp
 	ExpList  []Exp
 }
 
-// local namelist [‘=’ explist]
-// namelist ::= Name {‘,’ Name}
-// explist ::= exp {‘,’ exp}
+// local namelist ['=' explist]
+// namelist ::= Name {',' Name}
+// explist ::= exp {',' exp}
 type LocalVarDeclStat struct {
 	LastLine int
 	NameList []string

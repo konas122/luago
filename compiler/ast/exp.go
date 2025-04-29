@@ -2,17 +2,17 @@ package ast
 
 /*
 exp ::=
-	nil | false | true | Numeral | LiteralString | ‘...’ | functiondef |
+	nil | false | true | Numeral | LiteralString | '...' | functiondef |
 	 prefixexp | tableconstructor | exp binop exp | unop exp
 
 prefixexp ::=
-	var | functioncall | ‘(’ exp ‘)’
+	var | functioncall | '(' exp ')'
 
 var ::=
-	Name | prefixexp ‘[’ exp ‘]’ | prefixexp ‘.’ Name
+	Name | prefixexp '[' exp ']' | prefixexp '.' Name
 
 functioncall ::=
-	prefixexp args | prefixexp ‘:’ Name args
+	prefixexp args | prefixexp ':' Name args
 */
 type Exp interface{}
 
@@ -57,10 +57,10 @@ type ConcatExp struct {
 	Exps []Exp
 }
 
-// tableconstructor ::= ‘{’ [fieldlist] ‘}’
+// tableconstructor ::= '{' [fieldlist] '}'
 // fieldlist ::= field {fieldsep field} [fieldsep]
-// field ::= ‘[’ exp ‘]’ ‘=’ exp | Name ‘=’ exp | exp
-// fieldsep ::= ‘,’ | ‘;’
+// field ::= '[' exp ']' '=' exp | Name '=' exp | exp
+// fieldsep ::= ',' | ';'
 type TableConstructorExp struct {
 	Line     int // line of `{` ?
 	LastLine int // line of `}`
@@ -69,9 +69,9 @@ type TableConstructorExp struct {
 }
 
 // functiondef ::= function funcbody
-// funcbody ::= ‘(’ [parlist] ‘)’ block end
-// parlist ::= namelist [‘,’ ‘...’] | ‘...’
-// namelist ::= Name {‘,’ Name}
+// funcbody ::= '(' [parlist] ')' block end
+// parlist ::= namelist [',' '...'] | '...'
+// namelist ::= Name {',' Name}
 type FuncDefExp struct {
 	Line     int
 	LastLine int // line of `end`
@@ -82,10 +82,10 @@ type FuncDefExp struct {
 
 /*
 prefixexp ::= Name |
-              ‘(’ exp ‘)’ |
-              prefixexp ‘[’ exp ‘]’ |
-              prefixexp ‘.’ Name |
-              prefixexp ‘:’ Name args |
+              '(' exp ')' |
+              prefixexp '[' exp ']' |
+              prefixexp '.' Name |
+              prefixexp ':' Name args |
               prefixexp args
 */
 

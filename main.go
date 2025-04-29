@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"luago/api"
 	"luago/chunk"
+	"luago/compiler/parser"
 	"luago/state"
 	"luago/vm"
 	"os"
@@ -17,13 +19,23 @@ func main() {
 			panic(err)
 		}
 
-		proto := chunk.Undump(data)
-		list(proto)
+		testParser(string(data), os.Args[1])
+		// proto := chunk.Undump(data)
+		// list(proto)
 
-		print("\n=========================\n\n")
+		// print("\n=========================\n\n")
 
-		luaMain(os.Args[1], data)
+		// luaMain(os.Args[1], data)
 	}
+}
+
+func testParser(chunk, chunkName string) {
+	ast := parser.Parse(chunk, chunkName)
+	b, err := json.Marshal(ast)
+	if err != nil {
+		panic(err)
+	}
+	println(string(b))
 }
 
 func luaMain(filename string, data []byte) {
