@@ -19,13 +19,13 @@ func main() {
 			panic(err)
 		}
 
-		testParser(string(data), os.Args[1])
+		// testParser(string(data), os.Args[1])
 		// proto := chunk.Undump(data)
 		// list(proto)
 
 		// print("\n=========================\n\n")
 
-		// luaMain(os.Args[1], data)
+		luaMain(os.Args[1], data)
 	}
 }
 
@@ -40,7 +40,7 @@ func testParser(chunk, chunkName string) {
 
 func luaMain(filename string, data []byte) {
 	lstate := state.New()
-	lstate.Register("print", print_test)
+	lstate.Register("print", print)
 	lstate.Register("getmetatable", getMetatable)
 	lstate.Register("setmetatable", setMetatable)
 	lstate.Register("next", next)
@@ -176,7 +176,7 @@ func printOperands(i vm.Instruction) {
 	}
 }
 
-func print_test(ls api.LuaState) int {
+func print(ls api.LuaState) int {
 	nArgs := ls.GetTop()
 	for i := 1; i <= nArgs; i++ {
 		if ls.IsBoolean(i) {
@@ -191,7 +191,6 @@ func print_test(ls api.LuaState) int {
 		}
 	}
 	fmt.Println()
-	// fmt.Println("\n`print_test` called!!")
 	return 0
 }
 

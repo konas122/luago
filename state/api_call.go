@@ -3,18 +3,27 @@ package state
 import (
 	. "luago/api"
 	"luago/chunk"
+	"luago/compiler"
 	"luago/vm"
 )
 
+// [-0, +1, –]
+// http://www.lua.org/manual/5.3/manual.html#lua_load
 func (self *luaState) Load(binchunk []byte, chunkName, mode string) int {
-	proto := chunk.Undump(binchunk)
+	var proto *chunk.Prototype
+	if chunk.IsBinaryChunk(binchunk) {
+		proto = chunk.Undump(binchunk)
+	} else {
+		proto = compiler.Compile(string(binchunk), chunkName)
+	}
+
 	c := newLuaClosure(proto)
 	self.stack.push(c)
 	if len(proto.Upvalues) > 0 {
 		env := self.registry.get(LUA_RIDX_GLOBALS)
 		c.upvals[0] = &upvalue{&env}
 	}
-	return 0
+	return LUA_OK
 }
 
 // [-(nargs+1), +nresults, e]

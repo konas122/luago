@@ -57,10 +57,15 @@ type ConcatExp struct {
 	Exps []Exp
 }
 
-// tableconstructor ::= '{' [fieldlist] '}'
-// fieldlist ::= field {fieldsep field} [fieldsep]
-// field ::= '[' exp ']' '=' exp | Name '=' exp | exp
-// fieldsep ::= ',' | ';'
+/*
+tableconstructor ::= '{' [fieldlist] '}'
+
+fieldlist ::= field {fieldsep field} [fieldsep]
+
+field ::= '[' exp ']' '=' exp | Name '=' exp | exp
+
+fieldsep ::= ',' | ';'
+*/
 type TableConstructorExp struct {
 	Line     int // line of `{` ?
 	LastLine int // line of `}`
@@ -68,10 +73,15 @@ type TableConstructorExp struct {
 	ValExps  []Exp
 }
 
-// functiondef ::= function funcbody
-// funcbody ::= '(' [parlist] ')' block end
-// parlist ::= namelist [',' '...'] | '...'
-// namelist ::= Name {',' Name}
+/*
+functiondef ::= function funcbody
+
+funcbody ::= '(' [parlist] ')' block end
+
+parlist ::= namelist [',' '...'] | '...'
+
+namelist ::= Name {',' Name}
+*/
 type FuncDefExp struct {
 	Line     int
 	LastLine int // line of `end`
