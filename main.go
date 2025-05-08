@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"luago/api"
 	"luago/chunk"
 	"luago/compiler/parser"
 	"luago/state"
@@ -14,7 +13,7 @@ import (
 
 func main() {
 	if len(os.Args) > 1 {
-		data, err := ioutil.ReadFile(os.Args[1])
+		_, err := ioutil.ReadFile(os.Args[1])
 		if err != nil {
 			panic(err)
 		}
@@ -25,7 +24,10 @@ func main() {
 
 		// print("\n=========================\n\n")
 
-		luaMain(os.Args[1], data)
+		lstate := state.New()
+		lstate.OpenLibs()
+		lstate.LoadFile(os.Args[1])
+		lstate.Call(0, -1)
 	}
 }
 
@@ -36,20 +38,6 @@ func testParser(chunk, chunkName string) {
 		panic(err)
 	}
 	println(string(b))
-}
-
-func luaMain(filename string, data []byte) {
-	lstate := state.New()
-	lstate.Register("print", print)
-	lstate.Register("getmetatable", getMetatable)
-	lstate.Register("setmetatable", setMetatable)
-	lstate.Register("next", next)
-	lstate.Register("pairs", pairs)
-	lstate.Register("ipairs", iPairs)
-	lstate.Register("error", error)
-	lstate.Register("pcall", pCall)
-	lstate.Load(data, filename, "b")
-	lstate.Call(0, 0)
 }
 
 func list(f *chunk.Prototype) {
@@ -174,80 +162,4 @@ func printOperands(i vm.Instruction) {
 		ax := i.Ax()
 		fmt.Printf("%d", -1-ax)
 	}
-}
-
-func print(ls api.LuaState) int {
-	nArgs := ls.GetTop()
-	for i := 1; i <= nArgs; i++ {
-		if ls.IsBoolean(i) {
-			fmt.Printf("%t", ls.ToBoolean(i))
-		} else if ls.IsString(i) {
-			fmt.Print(ls.ToString(i))
-		} else {
-			fmt.Print(ls.TypeName(ls.Type(i)))
-		}
-		if i < nArgs {
-			fmt.Print("\t")
-		}
-	}
-	fmt.Println()
-	return 0
-}
-
-func getMetatable(ls api.LuaState) int {
-	if !ls.GetMetatable(1) {
-		ls.PushNil()
-	}
-	return 1
-}
-
-func setMetatable(ls api.LuaState) int {
-	ls.SetMetatable(1)
-	return 1
-}
-
-func next(ls api.LuaState) int {
-	ls.SetTop(2)
-	if ls.Next(1) {
-		return 2
-	} else {
-		ls.PushNil()
-		return 1
-	}
-}
-
-func pairs(ls api.LuaState) int {
-	ls.PushGoFunction(next) /* will return generator, */
-	ls.PushValue(1)         /* state, */
-	ls.PushNil()
-	return 3
-}
-
-func iPairs(ls api.LuaState) int {
-	ls.PushGoFunction(_iPairsAux) /* iteration function */
-	ls.PushValue(1)               /* state */
-	ls.PushInteger(0)             /* initial value */
-	return 3
-}
-
-func _iPairsAux(ls api.LuaState) int {
-	i := ls.ToInteger(2) + 1
-	ls.PushInteger(i)
-	if ls.GetI(1, i) == api.LUA_TNIL {
-		return 1
-	} else {
-		return 2
-	}
-}
-
-func error(ls api.LuaState) int {
-	return ls.Error()
-}
-
-func pCall(ls api.LuaState) int {
-	nArgs := ls.GetTop() - 1
-	status := ls.PCall(nArgs, -1, 0)
-	ls.PushBoolean(status == api.LUA_OK)
-	ls.Insert(1)
-	return ls.GetTop()
 }

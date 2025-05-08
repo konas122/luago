@@ -5,6 +5,11 @@ type ArithOp = int
 type CompareOp = int
 
 type LuaState interface {
+	BasicAPI
+	AuxLib
+}
+
+type BasicAPI interface {
 	/* basic stack manipulation */
 	GetTop() int
 	AbsIndex(idx int) int
@@ -58,6 +63,7 @@ type LuaState interface {
 	Concat(n int)
 	Next(idx int) bool
 	Error() int
+	StringToNumber(s string) bool
 
 	/* get functions (Lua -> stack) */
 	NewTable()
