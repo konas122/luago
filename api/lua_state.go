@@ -22,6 +22,7 @@ type BasicAPI interface {
 	Remove(idx int)
 	Rotate(idx, n int)
 	SetTop(idx int)
+	XMove(to LuaState, n int)
 	/* access functions (stack -> Go) */
 	TypeName(tp LuaType) string
 	Type(idx int) LuaType
@@ -44,15 +45,19 @@ type BasicAPI interface {
 	ToString(idx int) string
 	ToStringX(idx int) (string, bool)
 	ToGoFunction(idx int) GoFunction
+	ToThread(idx int) LuaState
+	ToPointer(idx int) interface{}
 	/* push functions (Go -> stack) */
 	PushNil()
 	PushBoolean(b bool)
 	PushInteger(n int64)
 	PushNumber(n float64)
 	PushString(s string)
+	PushFString(fmt string, a ...interface{})
 	PushGoFunction(f GoFunction)
 	PushGoClosure(f GoFunction, n int)
 	PushGlobalTable()
+	PushThread() bool
 	/* Comparison and arithmetic functions */
 	Arith(op ArithOp)
 	Compare(idx1, idx2 int, op CompareOp) bool
@@ -89,6 +94,13 @@ type BasicAPI interface {
 	Load(chunk []byte, chunkName, mode string) int
 	Call(nArgs, nResults int)
 	PCall(nArgs, nResults, msgh int) int
+	/* coroutine functions */
+	NewThread() LuaState
+	Resume(from LuaState, nArgs int) int
+	Yield(nResults int) int
+	Status() int
+	IsYieldable() bool
+	GetStack() bool // debug
 }
 
 type GoFunction func(LuaState) int

@@ -5,18 +5,18 @@ import (
 	. "luago/compiler/lexer"
 )
 
-// prefixexp ::= var | functioncall | ‘(’ exp ‘)’
-// var ::=  Name | prefixexp ‘[’ exp ‘]’ | prefixexp ‘.’ Name
-// functioncall ::=  prefixexp args | prefixexp ‘:’ Name args
+// prefixexp ::= var | functioncall | '(' exp ')'
+// var ::=  Name | prefixexp '[' exp ']' | prefixexp '.' Name
+// functioncall ::=  prefixexp args | prefixexp ':' Name args
 
 /*
 prefixexp ::=
 
 	Name
-	| ‘(’ exp ‘)’
-	| prefixexp ‘[’ exp ‘]’
-	| prefixexp ‘.’ Name
-	| prefixexp [‘:’ Name] args
+	| '(' exp ')'
+	| prefixexp '[' exp ']'
+	| prefixexp '.' Name
+	| prefixexp [':' Name] args
 */
 func parsePrefixExp(lexer *Lexer) Exp {
 	var exp Exp
@@ -64,7 +64,7 @@ func _finishPrefixExp(lexer *Lexer, exp Exp) Exp {
 	}
 }
 
-// functioncall ::=  prefixexp args | prefixexp ‘:’ Name args
+// functioncall ::=  prefixexp args | prefixexp ':' Name args
 func _finishFuncCallExp(lexer *Lexer, prefixExp Exp) *FuncCallExp {
 	nameExp := _parseNameExp(lexer)
 	line := lexer.Line()
@@ -85,7 +85,7 @@ func _parseNameExp(lexer *Lexer) *StringExp {
 	return nil
 }
 
-// args ::=  ‘(’ [explist] ‘)’ | tableconstructor | LiteralString
+// args ::=  '(' [explist] ')' | tableconstructor | LiteralString
 func _parseArgs(lexer *Lexer) (args []Exp) {
 	switch lexer.LookAhead() {
 	case TOKEN_SEP_LPAREN: // '(' [explist] ')'
